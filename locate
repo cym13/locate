@@ -1,0 +1,169 @@
+#!/bin/sh
+
+HELP="locate - find files by name
+
+Usage: locate [OPTION]... PATTERN...
+
+Options:
+    -b, --basename          Match only the base name, opposite of --wholename
+    -c, --count             Writes only the number of matching entries
+    -d, --database DBPATH   Replace the default database path with DBPATH
+    -e, --existing          Print only entries that refer to existing files
+    -L, --follow            When checking whether files exist, follow symlinks
+    -h, --help              Print this help and exist
+    -i, --ignore-case       Ignore case distinction when matching patterns
+    -l, --limit, -n LIMIT   Exit successfully after finding LIMIT entries
+    -m, --mmap              Ignored, for compatibility with BSD and GNU locate
+    -P, --nofollow, -H      Opposite of --follow
+    -0, -null               Separate the entries on output with \\0
+    -S, --statistics        Write statistics about each read database
+    -q, --quiet             Write no messages about error encountered
+    -r, --regexp REGEXP     Search for a basic regexp
+    --regex                 Interpret all PATTERNs as extended regexps, default
+    -s, --stdio             Ignored, for compatibility with BSD and GNU locate
+    -u, --update            Updates the database
+    -V, --version           Write information about the version and license
+    -w, --wholename         Match only the whole path name."
+
+DBFILE="$HOME/.locatedb"
+USE_REGEX=false
+LIMIT=-0
+GFLAGS=""
+QUIET=""
+EXISTING=false
+FOLLOW=true
+FIELD_SEP="\n"
+BASENAME=false
+
+filter_existing() {
+    if $EXISTING ; then
+        cat -
+        return
+    fi
+    while read line ; do
+        if [ -L "$line" ] && $FOLLOW ; then
+            echo "$line"
+        elif [ -e "$line" ] ; then
+            echo "$line"
+        fi
+    done
+}
+
+name_match() {
+    if ! $BASENAME ; then
+        cat -
+    fi
+    while read line ; do
+        basename "$line"
+    done
+}
+
+if [ $# -eq 0 ] ; then
+    echo "$HELP"
+    exit
+fi
+
+if [ $0 = "updatedb" ] ; then
+    locate.sh -u
+    exit
+fi
+
+while [ $# -ne 0 ] ; do
+    case "$1" in
+        -b) ;& --basename)
+            BASENAME=true
+        ;;
+
+        -c) ;& --count)
+            GFLAGS="$GFLAGS -c"
+        ;;
+
+        -d) ;& --database)
+            shift
+            DBFILE="$1"
+        ;;
+
+        -e) ;& --existing)
+            EXISTING=true
+        ;;
+
+        -i) ;& --ignore-case)
+            GFLAGS="$GFLAGS -i"
+        ;;
+
+        -l) ;& --limit) ;& -n)
+            shift
+            LIMIT="$1"
+        ;;
+
+        -L) ;& --follow)
+            FOLLOW=true
+        ;;
+
+        -h) ;& --help)
+            echo "$HELP"
+            exit 0
+        ;;
+
+        -P) ;& --nofollow) ;& -H)
+            FOLLOW=false
+        ;;
+
+        -0) ;& --null)
+            FIELD_SEP="\0"
+        ;;
+
+        -q) ;& --quiet)
+            QUIET="-q"
+        ;;
+
+        -r) ;& --regexp)
+            shift
+            GFLAGS="$GFLAGS -e $1"
+        ;;
+
+        --regex)
+            USE_REGEX=true
+        ;;
+
+        -u) ;& --update)
+            find / > "$DBFILE"
+            exit
+        ;;
+
+        -m) ;& --mmap) ;&
+        -s) ;& --stdio)
+        ;;
+
+        -V) ;& --version)
+            echo "locate.sh - v0.1"
+            exit 0
+        ;;
+
+        -w) ;& --wholename)
+            BASENAME=false
+        ;;
+
+        -S) ;& --statistics)
+            wc -l $(echo $DBFILE | tr ':' ' ')
+        ;;
+
+        --)
+            shift
+        ;&
+
+         *)
+             break
+        ;;
+    esac
+    shift
+done
+
+while [ $# -ne 0 ] ; do
+    grep $GFLAGS $QUIET -- "$1" $(echo "$DBFILE" | tr ':' ' ') |\
+        filter_existing                                        |\
+        head $QUIET -n "$LIMIT"                                |\
+        name_match                                             |\
+        tr '\n' "$FIELD_SEP"
+    shift
+done
