@@ -44,8 +44,8 @@ available on any unix system.
 Install
 =======
 
-Simply copy `locate' to a directory in your path. You can update the database
-using `locate -u`, but if you prefer the traditional way you can make a
+Simply copy *locate* to a directory in your path. You can update the database
+using *locate -u*, but if you prefer the traditional way you can make a
 symbolic link to locate named "updatedb" and use that link instead.
 
 License
