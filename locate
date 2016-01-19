@@ -44,7 +44,7 @@ BASENAME=false
 PARTIAL_REGEX=false
 
 filter_existing() {
-    if $EXISTING ; then
+    if ! $EXISTING ; then
         cat -
         return
     fi
@@ -196,9 +196,9 @@ if $QUIET ; then
 fi
 
 while [ $# -ne 0 ] || $PARTIAL_REGEX ; do
-    grep $GFLAGS -- $(pattern "$1") $(echo "$DBFILE" | tr ':' ' ') |\
-    filter_existing                                                |\
-    head -n "$LIMIT"                                               |\
+    grep $GFLAGS -- "$(pattern "$1")" $(echo "$DBFILE" | tr ':' ' ') |\
+    filter_existing                                                  |\
+    head -n "$LIMIT"                                                 |\
     tr '\n' "$FIELD_SEP"
     shift
     PARTIAL_REGEX=false
