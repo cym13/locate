@@ -196,11 +196,11 @@ while [ $# -ne 0 ] ; do
 done
 
 if $QUIET ; then
-    exec grep $GFLAGS -- "$(pattern "$1")" $DBFILE
+    exec grep $GFLAGS -- $DBFILES
 fi
 
-grep $GFLAGS -- $(echo "$DBFILE" | tr ':' ' ') |\
-filter_existing                                |\
-head -n "$LIMIT"                               |\
+grep $GFLAGS -- $DBFILES |\
+filter_existing          |\
+head -n "$LIMIT"         |\
 tr '\n' "$FIELD_SEP"
 
