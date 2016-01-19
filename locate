@@ -89,13 +89,11 @@ pattern() {
 }
 
 if [ $# -eq 0 ] ; then
-    echo "$HELP"
-    exit
+    exec echo "$HELP"
 fi
 
 if [ $0 = "updatedb" ] ; then
-    locate.sh -u
-    exit
+    exec locate.sh -u
 fi
 
 while [ $# -ne 0 ] ; do
@@ -131,8 +129,7 @@ while [ $# -ne 0 ] ; do
         ;;
 
         -h) ;& --help)
-            echo "$HELP"
-            exit 0
+            exec echo "$HELP"
         ;;
 
         -P) ;& --nofollow) ;& -H)
@@ -158,8 +155,7 @@ while [ $# -ne 0 ] ; do
         ;;
 
         -u) ;& --update)
-            find / > "$DBFILE"
-            exit
+            exec find / > "$DBFILE"
         ;;
 
         -m) ;& --mmap) ;&
@@ -167,8 +163,7 @@ while [ $# -ne 0 ] ; do
         ;;
 
         -V) ;& --version)
-            echo "locate.sh - v$VERSION"
-            exit 0
+            exec echo "locate.sh - v$VERSION"
         ;;
 
         -w) ;& --wholename)
@@ -193,16 +188,19 @@ while [ $# -ne 0 ] ; do
     shift
 done
 
+DBFILES="$(echo "$DBFILE" | tr ':' ' ')"
+
+while [ $# -ne 0 ] ; do
+    GFLAGS="$GFLAGS -e $(pattern $1)"
+    shift
+done
+
 if $QUIET ; then
-    grep $GFLAGS -- $(pattern "$1") $(echo "$DBFILE" | tr ':' ' ')
-    exit
+    exec grep $GFLAGS -- "$(pattern "$1")" $DBFILE
 fi
 
-while [ $# -ne 0 ] || $PARTIAL_REGEX ; do
-    grep $GFLAGS -- "$(pattern "$1")" $(echo "$DBFILE" | tr ':' ' ') |\
-    filter_existing                                                  |\
-    head -n "$LIMIT"                                                 |\
-    tr '\n' "$FIELD_SEP"
-    shift
-    PARTIAL_REGEX=false
-done
+grep $GFLAGS -- $(echo "$DBFILE" | tr ':' ' ') |\
+filter_existing                                |\
+head -n "$LIMIT"                               |\
+tr '\n' "$FIELD_SEP"
+
