@@ -176,7 +176,10 @@ while [ $# -ne 0 ] ; do
         ;;
 
         -S) ;& --statistics)
-            wc -l $(echo $DBFILE | tr ':' ' ')
+            echo "$(wc -l $(echo $DBFILE | tr ':' ' ') | cut -d ' ' -f 1)" \
+                 "entries"
+            echo "$(du -b $DBFILE | tr '\t' ' ' | cut -d ' ' -f 1)" \
+                 "bytes used to store the database"
         ;;
 
         --)
