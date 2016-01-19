@@ -30,7 +30,7 @@ Implementation notes:
     - Patterns are quite primitive, using regex is advised
     - The --basename and --wholename options are ignored when using regex"
 
-VERSION="1.4"
+VERSION="1.5"
 
 DBFILE="$HOME/.locatedb"
 USE_REGEX=false
@@ -196,7 +196,7 @@ while [ $# -ne 0 ] ; do
 done
 
 if $QUIET ; then
-    exec grep $GFLAGS -- $DBFILES
+    exec grep -q $GFLAGS -- $DBFILES
 fi
 
 grep $GFLAGS -- $DBFILES |\
