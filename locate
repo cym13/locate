@@ -19,7 +19,7 @@ Options:
     -S, --statistics        Write statistics about each read database
     -q, --quiet             Write no messages about error encountered
     -r, --regexp REGEXP     Search for a basic regexp
-    --regex                 Interpret all PATTERNs as extended regexps, default
+    --regex                 Interpret all PATTERNs as extended regexps
     -s, --stdio             Ignored, for compatibility with BSD and GNU locate
     -u, --update            Updates the database
     -V, --version           Write information about the version and license
@@ -34,6 +34,7 @@ EXISTING=false
 FOLLOW=true
 FIELD_SEP="\n"
 BASENAME=false
+PARTIAL_REGEX=false
 
 filter_existing() {
     if $EXISTING ; then
@@ -56,6 +57,28 @@ name_match() {
     while read line ; do
         basename "$line"
     done
+}
+
+pattern() {
+    if $PARTIAL_REGEX ; then
+        return
+    fi
+
+    if $USE_REGEX ; then
+        echo "$1"
+        return
+    fi
+
+    expression="$(echo "$1" | sed 's/\./\\./
+                                   s/\*/\.*/g
+                                   s/\?/\.?/g')"
+    if $BASENAME ; then
+        expression="^\(/[^/]\+\)\+/${expression}$"
+    else
+        expression="^${expression}$"
+    fi
+
+    echo "$expression"
 }
 
 if [ $# -eq 0 ] ; then
@@ -120,6 +143,7 @@ while [ $# -ne 0 ] ; do
         -r) ;& --regexp)
             shift
             GFLAGS="$GFLAGS -e $1"
+            PARTIAL_REGEX=true
         ;;
 
         --regex)
@@ -159,11 +183,16 @@ while [ $# -ne 0 ] ; do
     shift
 done
 
-while [ $# -ne 0 ] ; do
-    grep $GFLAGS $QUIET -- "$1" $(echo "$DBFILE" | tr ':' ' ') |\
-        filter_existing                                        |\
-        head $QUIET -n "$LIMIT"                                |\
-        name_match                                             |\
-        tr '\n' "$FIELD_SEP"
+if $QUIET ; then
+    grep $GFLAGS -- $(pattern "$1") $(echo "$DBFILE" | tr ':' ' ')
+    exit
+fi
+
+while [ $# -ne 0 ] || $PARTIAL_REGEX ; do
+    grep $GFLAGS -- $(pattern "$1") $(echo "$DBFILE" | tr ':' ' ') |\
+    filter_existing                                                |\
+    head -n "$LIMIT"                                               |\
+    tr '\n' "$FIELD_SEP"
     shift
+    PARTIAL_REGEX=false
 done
