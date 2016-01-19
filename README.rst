@@ -25,15 +25,20 @@ Documentation
         -l, --limit, -n LIMIT   Exit successfully after finding LIMIT entries
         -m, --mmap              Ignored, for compatibility with BSD and GNU locate
         -P, --nofollow, -H      Opposite of --follow
-        -0, -null               Separate the entries on output with \0
+        -0, --null              Separate the entries on output with \0
         -S, --statistics        Write statistics about each read database
         -q, --quiet             Write no messages about error encountered
         -r, --regexp REGEXP     Search for a basic regexp
-        --regex                 Interpret all PATTERNs as extended regexps, default
+        --regex                 Interpret all PATTERNs as extended regexps
         -s, --stdio             Ignored, for compatibility with BSD and GNU locate
         -u, --update            Updates the database
         -V, --version           Write information about the version and license
-        -w, --wholename         Match only the whole path name.
+        -w, --wholename         Match only the whole path name, the default.
+
+    Implementation notes:
+
+        - Patterns are quite primitive, using regex is advised
+        - The --basename and --wholename options are ignored when using regex
 
 Dependencies
 ============
