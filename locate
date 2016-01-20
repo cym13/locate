@@ -96,12 +96,12 @@ pattern() {
     echo "$expression"
 }
 
-if [ $# -eq 0 ] ; then
-    exec echo "$HELP"
-fi
-
 if [ $0 = "updatedb" ] ; then
     exec locate.sh -u
+fi
+
+if [ $# -eq 0 ] ; then
+    exec echo "$HELP"
 fi
 
 while [ $# -ne 0 ] ; do
