@@ -83,14 +83,14 @@ pattern() {
 
     expression="$(echo "$@" | sed 's/\./\\./g
                                    s/\*/\.*/g
-                                   s/\?/\.?/g')"
+                                   s/\?/\./g')"
 
     if $BASENAME ; then
         expression="\(/[^/]\+\)\+/${expression}"
     fi
 
     if ! $NAKED_PATTERN ; then
-        expression="^${expression}$"
+        expression="${expression}$"
     fi
 
     echo "$expression"
