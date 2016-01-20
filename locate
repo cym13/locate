@@ -72,16 +72,24 @@ pattern() {
     fi
 
     if $USE_REGEX ; then
-        echo "$1"
+        echo "$@"
         return
     fi
 
-    expression="$(echo "$1" | sed 's/\./\\./
+    NAKED_PATTERN=false
+    if ! ( echo "$@" | grep -q "\(*\|?\)" ) ; then
+        NAKED_PATTERN=true
+    fi
+
+    expression="$(echo "$@" | sed 's/\./\\./g
                                    s/\*/\.*/g
                                    s/\?/\.?/g')"
+
     if $BASENAME ; then
-        expression="^\(/[^/]\+\)\+/${expression}$"
-    else
+        expression="\(/[^/]\+\)\+/${expression}"
+    fi
+
+    if ! $NAKED_PATTERN ; then
         expression="^${expression}$"
     fi
 
