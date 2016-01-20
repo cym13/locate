@@ -30,7 +30,7 @@ Implementation notes:
     - Patterns are quite primitive, using regex is advised
     - The --basename and --wholename options are ignored when using regex"
 
-VERSION="1.5"
+VERSION="1.6"
 
 DBFILE="$HOME/.locatedb"
 USE_REGEX=false
@@ -146,7 +146,7 @@ while [ $# -ne 0 ] ; do
 
         -r) ;& --regexp)
             shift
-            GFLAGS="$GFLAGS -e $1"
+            GFLAGS="$GFLAGS -e '$1'"
             PARTIAL_REGEX=true
         ;;
 
@@ -191,16 +191,17 @@ done
 DBFILES="$(echo "$DBFILE" | tr ':' ' ')"
 
 while [ $# -ne 0 ] ; do
-    GFLAGS="$GFLAGS -e $(pattern $1)"
+    GFLAGS="$GFLAGS -e '$(pattern $1)'"
     shift
 done
 
 if $QUIET ; then
-    exec grep -q $GFLAGS -- $DBFILES
+    eval "grep -q $GFLAGS -- $DBFILES"
+    exit
 fi
 
-grep $GFLAGS -- $DBFILES |\
-filter_existing          |\
-head -n "$LIMIT"         |\
+eval "grep $GFLAGS -- $DBFILES" |\
+filter_existing                 |\
+head -n "$LIMIT"                |\
 tr '\n' "$FIELD_SEP"
 
