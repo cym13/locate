@@ -35,10 +35,18 @@ Documentation
         -V, --version           Write information about the version and license
         -w, --wholename         Match only the whole path name, the default.
 
-    Implementation notes:
+Implementation notes
+====================
 
-        - Patterns are quite primitive, using regex is advised
-        - The --basename and --wholename options are ignored when using regex
+- Patterns are quite primitive, using regex is advised
+- The --basename and --wholename options are ignored when using regex
+
+On performances
+===============
+
+Experience shows that when not using patterns this version is far superior in
+term of speed. However its performances are far worse when using patterns or
+regexes.
 
 Dependencies
 ============
