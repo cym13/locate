@@ -30,7 +30,7 @@ Implementation notes:
     - Patterns are quite primitive, using regex is advised
     - The --basename and --wholename options are ignored when using regex"
 
-VERSION="1.6"
+VERSION="1.7"
 
 DBFILE="$HOME/.locatedb"
 USE_REGEX=false
