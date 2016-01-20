@@ -165,7 +165,7 @@ while [ $# -ne 0 ] ; do
         -u) ;& --update)
             DBFILE="$(echo "$DBFILE" | cut -d : -f 1)"
             find / > "${DBFILE}.tmp"
-            mv "${DBFILE}.tmp" "${DBFILE}"
+            exec mv "${DBFILE}.tmp" "${DBFILE}"
         ;;
 
         -m) ;& --mmap) ;&
@@ -185,6 +185,7 @@ while [ $# -ne 0 ] ; do
                  "entries"
             echo "$(du -b $DBFILE | tr '\t' ' ' | cut -d ' ' -f 1)" \
                  "bytes used to store the database"
+            exit
         ;;
 
         --)
