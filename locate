@@ -96,8 +96,8 @@ pattern() {
     echo "$expression"
 }
 
-if [ $0 = "updatedb" ] ; then
-    exec locate.sh -u
+if ( echo "$0" | grep -q "/updatedb$" ) ; then
+    exec locate -u "$@"
 fi
 
 if [ $# -eq 0 ] ; then
@@ -163,7 +163,9 @@ while [ $# -ne 0 ] ; do
         ;;
 
         -u) ;& --update)
-            exec find / > "$DBFILE"
+            DBFILE="$(echo "$DBFILE" | cut -d : -f 1)"
+            find / > "${DBFILE}.tmp"
+            mv "${DBFILE}.tmp" "${DBFILE}"
         ;;
 
         -m) ;& --mmap) ;&
