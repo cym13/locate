@@ -164,8 +164,9 @@ while [ $# -ne 0 ] ; do
 
         -u) ;& --update)
             DBFILE="$(echo "$DBFILE" | cut -d : -f 1)"
-            find / > "${DBFILE}.tmp"
-            exec mv "${DBFILE}.tmp" "${DBFILE}"
+            tmp_dbfile="$(mktemp)"
+            find / > "$tmp_dbfile"
+            exec mv "$tmp_dbfile" "${DBFILE}"
         ;;
 
         -m) ;& --mmap) ;&
