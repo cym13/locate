@@ -48,7 +48,7 @@ filter_existing() {
         cat -
         return
     fi
-    while read line ; do
+    while read -r line ; do
         if [ -L "$line" ] && $FOLLOW ; then
             echo "$line"
         elif [ -e "$line" ] ; then
@@ -61,7 +61,7 @@ name_match() {
     if ! $BASENAME ; then
         cat -
     fi
-    while read line ; do
+    while read -r line ; do
         basename "$line"
     done
 }
@@ -181,9 +181,9 @@ while [ $# -ne 0 ] ; do
         ;;
 
         -S) ;& --statistics)
-            echo "$(wc -l $(echo $DBFILE | tr ':' ' ') | cut -d ' ' -f 1)" \
+            echo "$(wc -l "$(echo "$DBFILE" | tr ':' ' ')" | cut -d ' ' -f 1)" \
                  "entries"
-            echo "$(du -b $DBFILE | tr '\t' ' ' | cut -d ' ' -f 1)" \
+            echo "$(du -b "$DBFILE" | tr '\t' ' ' | cut -d ' ' -f 1)" \
                  "bytes used to store the database"
             exit
         ;;
@@ -202,7 +202,7 @@ done
 DBFILES="$(echo "$DBFILE" | tr ':' ' ')"
 
 while [ $# -ne 0 ] ; do
-    GFLAGS="$GFLAGS -e '$(pattern $1)'"
+    GFLAGS="$GFLAGS -e '$(pattern "$1")'"
     shift
 done
 
