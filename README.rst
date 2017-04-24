@@ -2,7 +2,7 @@ Description
 ===========
 
 This is an  implementation of locate in bash. I believe it is consequently
-faster than locate in all circumstances. This is based on a previous
+faster than locate in most circumstances. This is based on a previous
 analysis_ by Julia Evans.
 
 .. _analysis: http://jvns.ca/blog/2015/03/05/how-the-locate-command-works-and-lets-rewrite-it-in-one-minute/
